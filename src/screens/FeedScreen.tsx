@@ -9,6 +9,8 @@ import {
 import { logout } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 import { useFeed } from "../hooks/useFeed";
+import { getDomainFromUrl } from "../utils/getDomainFromUrl";
+import { getRelativeTime } from "../utils/getRelativeTime";
 
 export default function FeedScreen() {
   const { signOut } = useAuth();
@@ -47,6 +49,18 @@ export default function FeedScreen() {
         renderItem={({ item }) => (
           <View style={styles.articleRow}>
             <Text style={styles.articleTitle}>{item.title}</Text>
+
+            <View style={styles.metaRow}>
+              <Text style={styles.metaText}>Score: {item.score}</Text>
+              <Text style={styles.metaText}>
+                Comments: {item.descendants ?? 0}
+              </Text>
+            </View>
+
+            <View style={styles.metaRow}>
+              <Text style={styles.metaText}>{getDomainFromUrl(item.url)}</Text>
+              <Text style={styles.metaText}>{getRelativeTime(item.time)}</Text>
+            </View>
           </View>
         )}
         contentContainerStyle={styles.listContent}
@@ -76,9 +90,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#D1D5DB",
     borderRadius: 8,
+    gap: 8,
   },
   articleTitle: {
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "600",
+  },
+  metaRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  metaText: {
+    fontSize: 13,
+    color: "#6B7280",
+    flexShrink: 1,
   },
 });
