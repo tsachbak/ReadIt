@@ -15,6 +15,7 @@ import { getDomainFromUrl } from "../utils/getDomainFromUrl";
 import { getRelativeTime } from "../utils/getRelativeTime";
 import { RootStackParamList } from "../navigation/types";
 import { useBookmarksStore } from "../store/bookmarksStore";
+import { useNetworkStatus } from "../hooks/useNetworkStatus";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Feed">;
 
@@ -29,7 +30,7 @@ export default function FeedScreen({ navigation }: Props) {
     loadMore,
     refresh,
   } = useFeed();
-
+  const isConnected = useNetworkStatus();
   const toggleBookmark = useBookmarksStore((state) => state.toggleBookmark);
   const bookmarkedArticles = useBookmarksStore(
     (state) => state.bookmarkedArticles,
@@ -49,7 +50,7 @@ export default function FeedScreen({ navigation }: Props) {
     );
   }
 
-  if (errorMessage) {
+  if (errorMessage && articles.length === 0) {
     return (
       <View style={styles.centeredContainer}>
         <Text>{errorMessage}</Text>
@@ -60,6 +61,12 @@ export default function FeedScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
+      <View
+        style={[
+          styles.networkIndicator,
+          { backgroundColor: isConnected ? "#34D399" : "#EF4444" },
+        ]}
+      />
       <View style={styles.topActions}>
         <Button
           title="Saved Articles"
@@ -140,6 +147,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 8,
     gap: 12,
+  },
+  networkIndicator: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    zIndex: 10,
   },
   centeredContainer: {
     flex: 1,

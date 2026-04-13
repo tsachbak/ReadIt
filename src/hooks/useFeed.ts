@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchTopStoriesPage } from "../api/hackerNews/hackerNewsApi";
 import { HackerNewsItem } from "../api/hackerNews/hackerNews.types";
+import { getCachedFeed, saveCachedFeed } from "../services/feedCacheService";
 
 export function useFeed() {
   const [articles, setArticles] = useState<HackerNewsItem[]>([]);
@@ -16,11 +17,21 @@ export function useFeed() {
         setIsLoading(true);
         setErrorMessage(null);
 
+        //throw new Error("Simulated network error"); // Simulate a network error for testing
+
         const data = await fetchTopStoriesPage(0);
         setArticles(data);
         setPage(0);
+        await saveCachedFeed(data);
       } catch {
-        setErrorMessage("Failed to load articles");
+        const cachedData = await getCachedFeed();
+
+        if (cachedData.length > 0) {
+          setArticles(cachedData);
+          setErrorMessage("Showing cached articles due to network error");
+        } else {
+          setErrorMessage("Failed to load articles");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -36,6 +47,7 @@ export function useFeed() {
       const data = await fetchTopStoriesPage(0);
       setArticles(data);
       setPage(0);
+      await saveCachedFeed(data);
     } catch {
       setErrorMessage("Failed to refresh articles");
     } finally {
