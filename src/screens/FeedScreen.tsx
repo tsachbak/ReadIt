@@ -14,6 +14,7 @@ import { useFeed } from "../hooks/useFeed";
 import { getDomainFromUrl } from "../utils/getDomainFromUrl";
 import { getRelativeTime } from "../utils/getRelativeTime";
 import { RootStackParamList } from "../navigation/types";
+import { useBookmarksStore } from "../store/bookmarksStore";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Feed">;
 
@@ -28,6 +29,11 @@ export default function FeedScreen({ navigation }: Props) {
     loadMore,
     refresh,
   } = useFeed();
+
+  const toggleBookmark = useBookmarksStore((state) => state.toggleBookmark);
+  const bookmarkedArticles = useBookmarksStore(
+    (state) => state.bookmarkedArticles,
+  );
 
   const handleLogout = async () => {
     await logout();
@@ -59,26 +65,47 @@ export default function FeedScreen({ navigation }: Props) {
       <FlatList
         data={articles}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <Pressable
-            style={styles.articleRow}
-            onPress={() => navigation.navigate("Detail", { article: item })}
-          >
-            <Text style={styles.articleTitle}>{item.title}</Text>
+        renderItem={({ item }) => {
+          const bookmarked = bookmarkedArticles.some(
+            (savedArticle) => savedArticle.id === item.id,
+          );
 
-            <View style={styles.metaRow}>
-              <Text style={styles.metaText}>Score: {item.score}</Text>
-              <Text style={styles.metaText}>
-                Comments: {item.descendants ?? 0}
-              </Text>
-            </View>
+          return (
+            <Pressable
+              onPress={() => navigation.navigate("Detail", { article: item })}
+              style={styles.articleRow}
+            >
+              <View style={styles.titleRow}>
+                <Text style={styles.articleTitle}>{item.title}</Text>
 
-            <View style={styles.metaRow}>
-              <Text style={styles.metaText}>{getDomainFromUrl(item.url)}</Text>
-              <Text style={styles.metaText}>{getRelativeTime(item.time)}</Text>
-            </View>
-          </Pressable>
-        )}
+                <Pressable
+                  onPress={() => toggleBookmark(item)}
+                  style={styles.bookmarkButton}
+                >
+                  <Text style={styles.bookmarkText}>
+                    {bookmarked ? "Saved" : "Save"}
+                  </Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.metaRow}>
+                <Text style={styles.metaText}>Score: {item.score}</Text>
+                <Text style={styles.metaText}>
+                  Comments: {item.descendants ?? 0}
+                </Text>
+              </View>
+
+              <View style={styles.metaRow}>
+                <Text style={styles.metaText}>
+                  {getDomainFromUrl(item.url)}
+                </Text>
+                <Text style={styles.metaText}>
+                  {getRelativeTime(item.time)}
+                </Text>
+              </View>
+            </Pressable>
+          );
+        }}
         contentContainerStyle={styles.listContent}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
@@ -119,8 +146,26 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     gap: 8,
   },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 12,
+  },
   articleTitle: {
+    flex: 1,
     fontSize: 16,
+    fontWeight: "600",
+  },
+  bookmarkButton: {
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  bookmarkText: {
+    fontSize: 12,
     fontWeight: "600",
   },
   metaRow: {
