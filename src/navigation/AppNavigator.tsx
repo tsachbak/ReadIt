@@ -27,7 +27,11 @@ export default function AppNavigator() {
         {isAuthenticated ? (
           <>
             <Stack.Screen name="Feed" component={FeedScreen} />
-            <Stack.Screen name="Detail" component={ArticleDetailScreen} />
+            <Stack.Screen
+              name="Detail"
+              component={ArticleDetailScreen}
+              options={{ title: "Article Detail" }}
+            />
           </>
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />
