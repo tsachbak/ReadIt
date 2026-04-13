@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import LoginScreen from "../screens/LoginScreen";
 import FeedScreen from "../screens/FeedScreen";
+import ArticleDetailScreen from "../screens/ArticleDetailScreen";
 import { RootStackParamList } from "./types";
 import { useAuth } from "../hooks/useAuth";
 
@@ -24,7 +25,10 @@ export default function AppNavigator() {
     <NavigationContainer>
       <Stack.Navigator>
         {isAuthenticated ? (
-          <Stack.Screen name="Feed" component={FeedScreen} />
+          <>
+            <Stack.Screen name="Feed" component={FeedScreen} />
+            <Stack.Screen name="Detail" component={ArticleDetailScreen} />
+          </>
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />
         )}

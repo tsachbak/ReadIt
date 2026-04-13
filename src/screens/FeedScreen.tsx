@@ -2,17 +2,22 @@ import {
   ActivityIndicator,
   Button,
   FlatList,
+  Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { logout } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 import { useFeed } from "../hooks/useFeed";
 import { getDomainFromUrl } from "../utils/getDomainFromUrl";
 import { getRelativeTime } from "../utils/getRelativeTime";
+import { RootStackParamList } from "../navigation/types";
 
-export default function FeedScreen() {
+type Props = NativeStackScreenProps<RootStackParamList, "Feed">;
+
+export default function FeedScreen({ navigation }: Props) {
   const { signOut } = useAuth();
   const {
     articles,
@@ -55,7 +60,10 @@ export default function FeedScreen() {
         data={articles}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.articleRow}>
+          <Pressable
+            style={styles.articleRow}
+            onPress={() => navigation.navigate("Detail", { article: item })}
+          >
             <Text style={styles.articleTitle}>{item.title}</Text>
 
             <View style={styles.metaRow}>
@@ -69,7 +77,7 @@ export default function FeedScreen() {
               <Text style={styles.metaText}>{getDomainFromUrl(item.url)}</Text>
               <Text style={styles.metaText}>{getRelativeTime(item.time)}</Text>
             </View>
-          </View>
+          </Pressable>
         )}
         contentContainerStyle={styles.listContent}
         onEndReached={loadMore}
