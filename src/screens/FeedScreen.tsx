@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -7,35 +6,13 @@ import {
   Text,
   View,
 } from "react-native";
-import { fetchTopStoriesPage } from "../api/hackerNews/hackerNewsApi";
-import { HackerNewsItem } from "../api/hackerNews/hackerNews.types";
 import { logout } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
+import { useFeed } from "../hooks/useFeed";
 
 export default function FeedScreen() {
   const { signOut } = useAuth();
-
-  const [articles, setArticles] = useState<HackerNewsItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadArticles = async () => {
-      try {
-        setIsLoading(true);
-        setErrorMessage(null);
-
-        const data = await fetchTopStoriesPage(0);
-        setArticles(data);
-      } catch {
-        setErrorMessage("Failed to load articles");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadArticles();
-  }, []);
+  const { articles, isLoading, errorMessage } = useFeed();
 
   const handleLogout = async () => {
     await logout();
