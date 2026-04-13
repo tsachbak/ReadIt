@@ -14,7 +14,15 @@ import { getRelativeTime } from "../utils/getRelativeTime";
 
 export default function FeedScreen() {
   const { signOut } = useAuth();
-  const { articles, isLoading, errorMessage } = useFeed();
+  const {
+    articles,
+    isLoading,
+    isLoadingMore,
+    isRefreshing,
+    errorMessage,
+    loadMore,
+    refresh,
+  } = useFeed();
 
   const handleLogout = async () => {
     await logout();
@@ -64,6 +72,17 @@ export default function FeedScreen() {
           </View>
         )}
         contentContainerStyle={styles.listContent}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
+        refreshing={isRefreshing}
+        onRefresh={refresh}
+        ListFooterComponent={
+          isLoadingMore ? (
+            <View style={styles.footerLoader}>
+              <ActivityIndicator />
+            </View>
+          ) : null
+        }
       />
     </View>
   );
@@ -105,5 +124,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#6B7280",
     flexShrink: 1,
+  },
+  footerLoader: {
+    paddingVertical: 16,
   },
 });
