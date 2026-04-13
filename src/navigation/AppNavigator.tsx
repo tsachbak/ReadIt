@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "../screens/LoginScreen";
 import FeedScreen from "../screens/FeedScreen";
 import ArticleDetailScreen from "../screens/ArticleDetailScreen";
+import SavedArticlesScreen from "../screens/savedArticlesScreen";
 import { RootStackParamList } from "./types";
 import { useAuth } from "../hooks/useAuth";
 
@@ -31,6 +32,11 @@ export default function AppNavigator() {
               name="Detail"
               component={ArticleDetailScreen}
               options={{ title: "Article Detail" }}
+            />
+            <Stack.Screen
+              name="SavedArticles"
+              component={SavedArticlesScreen}
+              options={{ title: "Saved Articles" }}
             />
           </>
         ) : (

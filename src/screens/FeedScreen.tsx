@@ -60,7 +60,13 @@ export default function FeedScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Button title="Logout" onPress={handleLogout} />
+      <View style={styles.topActions}>
+        <Button
+          title="Saved Articles"
+          onPress={() => navigation.navigate("SavedArticles")}
+        />
+        <Button title="Logout" onPress={handleLogout} />
+      </View>
 
       <FlatList
         data={articles}
@@ -127,6 +133,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 16,
+  },
+  topActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    gap: 12,
   },
   centeredContainer: {
     flex: 1,

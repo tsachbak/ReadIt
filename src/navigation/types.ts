@@ -6,4 +6,5 @@ export type RootStackParamList = {
   Detail: {
     article: HackerNewsItem;
   };
+  SavedArticles: undefined;
 };
