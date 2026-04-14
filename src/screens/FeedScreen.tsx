@@ -2,7 +2,6 @@ import {
   ActivityIndicator,
   Button,
   FlatList,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -11,11 +10,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { logout } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 import { useFeed } from "../hooks/useFeed";
-import { getDomainFromUrl } from "../utils/getDomainFromUrl";
-import { getRelativeTime } from "../utils/getRelativeTime";
 import { RootStackParamList } from "../navigation/types";
-import { useBookmarksStore } from "../store/bookmarksStore";
 import { useNetworkStatus } from "../hooks/useNetworkStatus";
+import ArticleCard from "../components/ArticleCard";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Feed">;
 
@@ -31,10 +28,6 @@ export default function FeedScreen({ navigation }: Props) {
     refresh,
   } = useFeed();
   const isConnected = useNetworkStatus();
-  const toggleBookmark = useBookmarksStore((state) => state.toggleBookmark);
-  const bookmarkedArticles = useBookmarksStore(
-    (state) => state.bookmarkedArticles,
-  );
 
   const handleLogout = async () => {
     await logout();
@@ -78,47 +71,13 @@ export default function FeedScreen({ navigation }: Props) {
       <FlatList
         data={articles}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => {
-          const bookmarked = bookmarkedArticles.some(
-            (savedArticle) => savedArticle.id === item.id,
-          );
-
-          return (
-            <Pressable
-              onPress={() => navigation.navigate("Detail", { article: item })}
-              style={styles.articleRow}
-            >
-              <View style={styles.titleRow}>
-                <Text style={styles.articleTitle}>{item.title}</Text>
-
-                <Pressable
-                  onPress={() => toggleBookmark(item)}
-                  style={styles.bookmarkButton}
-                >
-                  <Text style={styles.bookmarkText}>
-                    {bookmarked ? "Saved" : "Save"}
-                  </Text>
-                </Pressable>
-              </View>
-
-              <View style={styles.metaRow}>
-                <Text style={styles.metaText}>Score: {item.score}</Text>
-                <Text style={styles.metaText}>
-                  Comments: {item.descendants ?? 0}
-                </Text>
-              </View>
-
-              <View style={styles.metaRow}>
-                <Text style={styles.metaText}>
-                  {getDomainFromUrl(item.url)}
-                </Text>
-                <Text style={styles.metaText}>
-                  {getRelativeTime(item.time)}
-                </Text>
-              </View>
-            </Pressable>
-          );
-        }}
+        renderItem={({ item }) => (
+          <ArticleCard
+            article={item}
+            onPress={() => navigation.navigate("Detail", { article: item })}
+            actionMode="toggle"
+          />
+        )}
         contentContainerStyle={styles.listContent}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
@@ -167,45 +126,6 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 16,
     gap: 12,
-  },
-  articleRow: {
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 8,
-    gap: 8,
-  },
-  titleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 12,
-  },
-  articleTitle: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  bookmarkButton: {
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  bookmarkText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  metaRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  metaText: {
-    fontSize: 13,
-    color: "#6B7280",
-    flexShrink: 1,
   },
   footerLoader: {
     paddingVertical: 16,
