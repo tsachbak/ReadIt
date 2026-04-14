@@ -9,6 +9,12 @@ type Props = {
   onLogout: () => void;
 };
 
+/**
+ * Global top navigation bar shared across all authenticated screens.
+ *
+ * Renders the app title, current screen label, a live network connectivity badge,
+ * Feed/Saved tab switcher with active-state highlighting, and the logout action.
+ */
 export default function TopBar({
   title,
   activeTab,

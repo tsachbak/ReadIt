@@ -21,6 +21,14 @@ type Props = {
   animationTrigger?: number;
 };
 
+/**
+ * Reusable article card used in both Feed and Saved lists.
+ *
+ * Supports:
+ * - bookmark toggle or removal mode
+ * - navigation press handling
+ * - optional entry animation with external trigger support
+ */
 export default function ArticleCard({
   article,
   onPress,
@@ -39,6 +47,9 @@ export default function ArticleCard({
     (saved) => saved.id === article.id,
   );
 
+  /**
+   * Handles the contextual card action (save/remove) based on the current mode.
+   */
   const handleActionPress = () => {
     if (actionMode === "remove") {
       removeBookmark(article.id);

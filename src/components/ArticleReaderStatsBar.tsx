@@ -5,6 +5,9 @@ type Props = {
   comments: number;
 };
 
+/**
+ * Slim bar mounted above the WebView reader showing article score and comment count.
+ */
 export default function ArticleReaderStatsBar({ score, comments }: Props) {
   return (
     <View style={styles.container}>

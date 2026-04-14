@@ -1,6 +1,11 @@
 import { useEffect, useRef } from "react";
 import { Animated, Easing, StyleSheet, View } from "react-native";
 
+/**
+ * Animated shimmer skeleton rendered while articles are loading.
+ *
+ * Mimics the ArticleCard layout to prevent layout shift when real content arrives.
+ */
 export default function ArticleCardSkeleton() {
   const shimmerTranslateX = useRef(new Animated.Value(-140)).current;
 

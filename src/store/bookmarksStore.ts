@@ -10,6 +10,12 @@ type BookmarksState = {
   removeBookmark: (articleId: number) => void;
 };
 
+/**
+ * Zustand store managing persisted bookmarked articles.
+ *
+ * State is automatically serialized to AsyncStorage via the persist middleware,
+ * so bookmarks survive app restarts without any additional wiring.
+ */
 export const useBookmarksStore = create<BookmarksState>()(
   persist(
     (set, get) => ({

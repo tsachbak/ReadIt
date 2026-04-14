@@ -11,6 +11,13 @@ import { useAuth } from "../hooks/useAuth";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+/**
+ * Root navigation component that gates authenticated and unauthenticated routes.
+ *
+ * Shows a loading indicator while auth state is being restored from secure storage.
+ * Renders the authenticated stack (Feed → Detail → Saved) or the Login screen
+ * based on the current session state.
+ */
 export default function AppNavigator() {
   const { isAuthenticated, isLoading } = useAuth();
 

@@ -12,6 +12,12 @@ import {
 import { login } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 
+/**
+ * Authentication entry screen with mock credential login.
+ *
+ * Validates against a fixed demo account. On success, persists an auth token
+ * and signals the auth provider to open the authenticated navigation stack.
+ */
 export default function LoginScreen() {
   const { signIn } = useAuth();
 
@@ -20,6 +26,10 @@ export default function LoginScreen() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  /**
+   * Submits the login form, persists the auth token on success,
+   * and transitions the app to the authenticated stack.
+   */
   const handleLogin = async () => {
     try {
       setIsSubmitting(true);

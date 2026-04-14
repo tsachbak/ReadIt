@@ -12,6 +12,12 @@ type Props = {
   showStatsRow: boolean;
 };
 
+/**
+ * Compact header for the article detail screen.
+ *
+ * Renders the source label, title, metadata row, optional published date,
+ * and an optional stats row. The bookmark toggle is inlined for immediate access.
+ */
 export default function ArticleDetailHeader({
   article,
   sourceLabel,

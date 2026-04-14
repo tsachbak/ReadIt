@@ -3,6 +3,15 @@ import { fetchTopStoriesPage } from "../api/hackerNews/hackerNewsApi";
 import { HackerNewsItem } from "../api/hackerNews/hackerNews.types";
 import { getCachedFeed, saveCachedFeed } from "../services/feedCacheService";
 
+/**
+ * Encapsulates feed retrieval and pagination state.
+ *
+ * This hook is the single orchestration point for:
+ * - initial load
+ * - pull-to-refresh
+ * - pagination
+ * - offline cache fallback
+ */
 export function useFeed() {
   const [articles, setArticles] = useState<HackerNewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -11,12 +20,18 @@ export function useFeed() {
   const [page, setPage] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  /**
+   * Replaces the current feed with a new first page and synchronizes the cache.
+   */
   const replaceArticles = async (nextArticles: HackerNewsItem[]) => {
     setArticles(nextArticles);
     setPage(0);
     await saveCachedFeed(nextArticles);
   };
 
+  /**
+   * Appends only unseen stories to avoid duplicates when upstream ordering changes.
+   */
   const appendUniqueArticles = (nextArticles: HackerNewsItem[]) => {
     setArticles((currentArticles) => {
       const existingIds = new Set(currentArticles.map((article) => article.id));
@@ -54,6 +69,9 @@ export function useFeed() {
     loadInitial();
   }, []);
 
+  /**
+   * Refreshes page 0 and rewrites both in-memory and cached feed state.
+   */
   const refresh = async () => {
     try {
       setIsRefreshing(true);
@@ -68,6 +86,9 @@ export function useFeed() {
     }
   };
 
+  /**
+   * Loads the next page and merges unique stories into the existing feed.
+   */
   const loadMore = async () => {
     if (isLoading || isLoadingMore) return;
 

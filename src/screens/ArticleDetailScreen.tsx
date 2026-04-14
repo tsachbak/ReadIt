@@ -14,6 +14,12 @@ type Props = {
   route: ArticleDetailScreenRouteProp;
 };
 
+/**
+ * Article detail screen rendering a compact metadata header above a WebView reader.
+ *
+ * Falls back to a descriptive card when the article has no URL.
+ * Bookmark state is sourced from and persisted to the Zustand bookmarks store.
+ */
 export default function ArticleDetailScreen({ route }: Props) {
   const { article } = route.params;
   const toggleBookmark = useBookmarksStore((state) => state.toggleBookmark);
@@ -23,6 +29,7 @@ export default function ArticleDetailScreen({ route }: Props) {
     ),
   );
 
+  /** Toggles the bookmark state for the current article in the persistent store. */
   const handleBookmarkToggle = () => {
     toggleBookmark(article);
   };

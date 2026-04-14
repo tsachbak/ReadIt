@@ -18,6 +18,9 @@ import ArticleCardSkeleton from "../components/ArticleCardSkeleton";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Feed">;
 
+/**
+ * Main feed screen showing Hacker News top stories with refresh and pagination.
+ */
 export default function FeedScreen({ navigation }: Props) {
   const { signOut } = useAuth();
   const {
@@ -31,6 +34,9 @@ export default function FeedScreen({ navigation }: Props) {
   } = useFeed();
   const isConnected = useNetworkStatus();
 
+  /**
+   * Delegates sign-out to the auth provider, which owns token lifecycle logic.
+   */
   const handleLogout = async () => {
     await signOut();
   };
