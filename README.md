@@ -40,13 +40,14 @@ The app includes:
 
 Install:
 
-- Node.js 18+ (LTS recommended)
-- npm
+- Node.js 18+ (LTS recommended): https://nodejs.org/en/download
+- npm (installed automatically with Node.js)
 - Git
 
 For running on mobile:
 
 - Android Emulator / iOS Simulator, or Expo Go on a physical device
+- If using Expo Go, install the Expo Go app on the device first (App Store / Google Play)
 
 ### 2. Clone and Install
 
@@ -75,6 +76,8 @@ npm run android
 npm run ios
 npm run web
 ```
+
+Equivalent `npx` commands are also valid (for example: `npx expo start`).
 
 ## Optional APK (No Expo Go Required)
 
