@@ -88,7 +88,7 @@ An installable Android APK is available as an extra reviewer option.
 
 APK link for reviewers:
 
-- Expo build link: `https://expo.dev/accounts/tsach/projects/ReadIt/builds/91e8b7d9-2fae-41a3-8d88-47ce3c8034ff`
+- Expo build link: [Download APK](https://expo.dev/accounts/tsach/projects/ReadIt/builds/91e8b7d9-2fae-41a3-8d88-47ce3c8034ff)
 
 Note:
 
