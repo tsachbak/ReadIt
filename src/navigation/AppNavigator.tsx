@@ -37,7 +37,7 @@ export default function AppNavigator() {
             <Stack.Screen
               name="Feed"
               component={FeedScreen}
-              options={{ headerBackVisible: false }}
+              options={{ headerBackVisible: false, title: "" }}
             />
             <Stack.Screen
               name="Detail"
@@ -48,7 +48,7 @@ export default function AppNavigator() {
               name="SavedArticles"
               component={SavedArticlesScreen}
               options={{
-                title: "Favourite Articles",
+                title: "",
                 headerBackVisible: false,
               }}
             />
@@ -57,7 +57,7 @@ export default function AppNavigator() {
           <Stack.Screen
             name="Login"
             component={LoginScreen}
-            options={{ headerBackVisible: false }}
+            options={{ headerBackVisible: false, title: "" }}
           />
         )}
       </Stack.Navigator>

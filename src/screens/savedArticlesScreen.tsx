@@ -4,7 +4,6 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
 import { useNetworkStatus } from "../hooks/useNetworkStatus";
 import { useAuth } from "../hooks/useAuth";
-import { logout } from "../services/authService";
 import ArticleCard from "../components/ArticleCard";
 import TopBar from "../components/TopBar";
 
@@ -25,8 +24,7 @@ export default function SavedArticlesScreen({ navigation }: Props) {
    * Delegates sign-out to the auth provider, which owns token lifecycle logic.
    */
   const handleLogout = async () => {
-    await logout();
-    signOut();
+    await signOut();
   };
 
   return (
@@ -55,6 +53,9 @@ export default function SavedArticlesScreen({ navigation }: Props) {
               actionMode="remove"
             />
           )}
+          windowSize={10}
+          maxToRenderPerBatch={5}
+          contentContainerStyle={styles.listContent}
         />
       )}
     </View>

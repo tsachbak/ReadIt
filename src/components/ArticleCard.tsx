@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import {
   Animated,
   Easing,
@@ -29,7 +29,7 @@ type Props = {
  * - navigation press handling
  * - optional entry animation with external trigger support
  */
-export default function ArticleCard({
+function ArticleCard({
   article,
   onPress,
   actionMode = "toggle",
@@ -314,3 +314,5 @@ const styles = StyleSheet.create({
     color: "#64748B",
   },
 });
+
+export default memo(ArticleCard);

@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -7,6 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { HackerNewsItem } from "../api/hackerNews/hackerNews.types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAuth } from "../hooks/useAuth";
 import { useFeed } from "../hooks/useFeed";
@@ -40,6 +42,19 @@ export default function FeedScreen({ navigation }: Props) {
   const handleLogout = async () => {
     await signOut();
   };
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: HackerNewsItem; index: number }) => (
+      <ArticleCard
+        article={item}
+        onPress={() => navigation.navigate("Detail", { article: item })}
+        actionMode="toggle"
+        enableEntryAnimation
+        animationDelayMs={Math.min(index * 35, 210)}
+      />
+    ),
+    [navigation],
+  );
 
   const showRefreshSkeleton = isRefreshing && articles.length > 0;
 
@@ -91,20 +106,14 @@ export default function FeedScreen({ navigation }: Props) {
       <FlatList
         data={articles}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item, index }) => (
-          <ArticleCard
-            article={item}
-            onPress={() => navigation.navigate("Detail", { article: item })}
-            actionMode="toggle"
-            enableEntryAnimation
-            animationDelayMs={Math.min(index * 35, 210)}
-          />
-        )}
+        renderItem={renderItem}
         contentContainerStyle={styles.listContent}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
         refreshing={isRefreshing}
         onRefresh={refresh}
+        windowSize={10}
+        maxToRenderPerBatch={5}
         ListHeaderComponent={
           showRefreshSkeleton ? (
             <View style={styles.refreshSkeletonContainer}>
