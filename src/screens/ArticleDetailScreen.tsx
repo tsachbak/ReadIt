@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { WebView } from "react-native-webview";
 import { useBookmarksStore } from "../store/bookmarksStore";
+import { getDomainFromUrl } from "../utils/getDomainFromUrl";
+import { getRelativeTime } from "../utils/getRelativeTime";
 
 type ArticleDetailScreenRouteProp = RouteProp<RootStackParamList, "Detail">;
 
@@ -29,48 +31,129 @@ export default function ArticleDetailScreen({ route }: Props) {
     toggleBookmark(article);
   };
 
+  const sourceLabel = getDomainFromUrl(article.url);
+  const relativeTimeLabel = getRelativeTime(article.time);
+  const publishedLabel = new Date(article.time * 1000).toLocaleString();
+
   if (!article.url) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>{article.title}</Text>
-        <Text style={styles.meta}>Author: {article.by}</Text>
-        <Text style={styles.meta}>Score: {article.score}</Text>
-        <Text style={styles.meta}>
-          Date: {new Date(article.time * 1000).toLocaleString()}
-        </Text>
-        <Text style={styles.fallbackText}>No article URL available.</Text>
+        <View style={styles.compactHeader}>
+          <View style={styles.headerTopRow}>
+            <View style={styles.sourcePill}>
+              <Text style={styles.sourcePillText}>{sourceLabel}</Text>
+            </View>
+
+            <Pressable
+              onPress={handleBookmarkToggle}
+              style={[
+                styles.bookmarkButton,
+                isBookmarked && styles.bookmarkButtonSaved,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.bookmarkButtonText,
+                  isBookmarked && styles.bookmarkButtonTextSaved,
+                ]}
+              >
+                {isBookmarked ? "Saved" : "Save"}
+              </Text>
+            </Pressable>
+          </View>
+
+          <Text style={styles.title}>{article.title}</Text>
+
+          <View style={styles.metaRow}>
+            <Text style={styles.metaItem}>by {article.by}</Text>
+            <Text style={styles.metaDivider}>•</Text>
+            <Text style={styles.metaItem}>{relativeTimeLabel}</Text>
+          </View>
+
+          <View style={styles.statsRow}>
+            <View style={styles.statPill}>
+              <Text style={styles.statLabel}>Score</Text>
+              <Text style={styles.statValue}>{article.score}</Text>
+            </View>
+
+            <View style={styles.statPill}>
+              <Text style={styles.statLabel}>Comments</Text>
+              <Text style={styles.statValue}>{article.descendants ?? 0}</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.readerCard}>
+          <Text style={styles.emptyTitle}>No article URL available</Text>
+          <Text style={styles.emptyText}>
+            This story does not include a readable link. Published{" "}
+            {publishedLabel}.
+          </Text>
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerSection}>
-        <Text style={styles.title}>{article.title}</Text>
+      <View style={styles.compactHeader}>
+        <View style={styles.headerTopRow}>
+          <View style={styles.sourcePill}>
+            <Text style={styles.sourcePillText}>{sourceLabel}</Text>
+          </View>
 
-        <Pressable onPress={handleBookmarkToggle} style={styles.bookmarkButton}>
-          <Text style={styles.bookmarkButtonText}>
-            {isBookmarked ? "Saved" : "Save"}
-          </Text>
-        </Pressable>
+          <Pressable
+            onPress={handleBookmarkToggle}
+            style={[
+              styles.bookmarkButton,
+              isBookmarked && styles.bookmarkButtonSaved,
+            ]}
+          >
+            <Text
+              style={[
+                styles.bookmarkButtonText,
+                isBookmarked && styles.bookmarkButtonTextSaved,
+              ]}
+            >
+              {isBookmarked ? "Saved" : "Save"}
+            </Text>
+          </Pressable>
+        </View>
 
-        <Text style={styles.meta}>Author: {article.by}</Text>
-        <Text style={styles.meta}>Score: {article.score}</Text>
-        <Text style={styles.meta}>
-          Date: {new Date(article.time * 1000).toLocaleString()}
+        <Text numberOfLines={2} style={styles.title}>
+          {article.title}
         </Text>
+
+        <View style={styles.metaRow}>
+          <Text style={styles.metaItem}>by {article.by}</Text>
+          <Text style={styles.metaDivider}>•</Text>
+          <Text style={styles.metaItem}>{relativeTimeLabel}</Text>
+          <Text style={styles.metaDivider}>•</Text>
+          <Text style={styles.metaItem}>{publishedLabel}</Text>
+        </View>
       </View>
 
-      <WebView
-        source={{ uri: article.url }}
-        startInLoadingState
-        renderLoading={() => (
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator />
-          </View>
-        )}
-        style={styles.webView}
-      />
+      <View style={styles.readerCard}>
+        <View style={styles.headerInlineStats}>
+          <Text style={styles.inlineStatText}>Score {article.score}</Text>
+          <Text style={styles.inlineStatDivider}>•</Text>
+          <Text style={styles.inlineStatText}>
+            Comments {article.descendants ?? 0}
+          </Text>
+        </View>
+
+        <WebView
+          source={{ uri: article.url }}
+          startInLoadingState
+          renderLoading={() => (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator />
+              <Text style={styles.loaderText}>Loading article...</Text>
+            </View>
+          )}
+          style={styles.webView}
+        />
+      </View>
     </View>
   );
 }
@@ -78,37 +161,140 @@ export default function ArticleDetailScreen({ route }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#F8FAFC",
   },
-  headerSection: {
-    padding: 16,
-    gap: 8,
+  compactHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 8,
+    gap: 6,
+    backgroundColor: "#F8FAFC",
+  },
+  headerTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+  },
+  sourcePill: {
+    backgroundColor: "#EEF2FF",
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    maxWidth: "68%",
+  },
+  sourcePillText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#4338CA",
   },
   title: {
-    fontSize: 22,
+    fontSize: 18,
+    lineHeight: 24,
     fontWeight: "700",
+    color: "#0F172A",
   },
   bookmarkButton: {
     alignSelf: "flex-start",
     borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderColor: "#CBD5E1",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     backgroundColor: "#FFFFFF",
   },
+  bookmarkButtonSaved: {
+    borderColor: "#D1FAE5",
+    backgroundColor: "#ECFDF5",
+  },
   bookmarkButtonText: {
-    fontSize: 14,
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#334155",
+  },
+  bookmarkButtonTextSaved: {
+    color: "#047857",
+  },
+  metaRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+  },
+  metaItem: {
+    fontSize: 12,
     fontWeight: "600",
-    color: "#111827",
+    color: "#64748B",
   },
-  meta: {
-    fontSize: 16,
+  metaDivider: {
+    fontSize: 12,
+    color: "#94A3B8",
   },
-  fallbackText: {
-    fontSize: 16,
-    color: "#6B7280",
+  readerCard: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    overflow: "hidden",
+    borderTopWidth: 1,
+    borderTopColor: "#E2E8F0",
+  },
+  headerInlineStats: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
+    backgroundColor: "#F8FAFC",
+  },
+  inlineStatText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#475569",
+  },
+  inlineStatDivider: {
+    fontSize: 12,
+    color: "#94A3B8",
+  },
+  statsRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  statPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#F8FAFC",
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  statLabel: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#64748B",
+  },
+  statValue: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  emptyText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: "#64748B",
+    paddingTop: 4,
     paddingHorizontal: 16,
-    paddingTop: 8,
   },
   webView: {
     flex: 1,
@@ -117,5 +303,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    gap: 10,
+    backgroundColor: "#FFFFFF",
+  },
+  loaderText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#64748B",
   },
 });
