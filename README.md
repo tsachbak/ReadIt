@@ -28,6 +28,12 @@ The app includes:
 - react-native-webview
 - NetInfo
 
+## Tested Environment
+
+- Developed and tested with Expo Go on iPhone 14 Pro Max (iOS)
+- Also runnable via Android emulator/iOS simulator using the setup steps above
+- Optional Android APK provided for reviewer convenience
+
 ## Setup (Fresh Machine)
 
 ### 1. Prerequisites
@@ -69,6 +75,21 @@ npm run android
 npm run ios
 npm run web
 ```
+
+## Optional APK (No Expo Go Required)
+
+An installable Android APK is available as an extra reviewer option.
+
+- Install by downloading the APK and opening it on an Android device
+- If Android blocks installation, enable "Install unknown apps" for the browser/files app used to open the APK
+
+APK link for reviewers:
+
+- Expo build link: `https://expo.dev/accounts/tsach/projects/ReadIt/builds/91e8b7d9-2fae-41a3-8d88-47ce3c8034ff`
+
+Note:
+
+- Expo instructions remain the primary run path; APK is an additional convenience option.
 
 ## Requirement Coverage
 
@@ -162,6 +183,7 @@ This follows the suggested assignment structure with separation by responsibilit
 
 ## Trade-offs Made Under Time Pressure
 
+- Prioritized SRP and clean architectural boundaries (thin screens, logic in hooks/services, reusable components) over adding extra non-core features
 - Chose a robust mock auth flow (secure token + expiry) instead of implementing the optional backend JWT stub
 - Focused on one polished visual style and meaningful animation set rather than broader feature breadth
 - Implemented offline fallback for feed and full offline saved-article metadata; skipped stale-while-revalidate strategy to keep behavior predictable
@@ -173,49 +195,6 @@ This follows the suggested assignment structure with separation by responsibilit
 - Add error boundary + dedicated offline empty/error states per screen
 - Add accessibility and reduced-motion handling
 - Add CI checks (type-check/lint/test) and release pipeline
-
-## Optional APK Distribution (Extra, Not Instead of Expo)
-
-You can provide an APK so reviewers can install without Expo Go.
-
-### Option A: Attach a prebuilt APK in GitHub Releases
-
-- Build the APK using Option B
-- Upload the generated `.apk` file to a GitHub Release
-- Add the Release URL in this README for one-click install
-
-### Option B: Build APK with EAS
-
-1. Install EAS CLI:
-
-```bash
-npm install -g eas-cli
-```
-
-2. Login:
-
-```bash
-eas login
-```
-
-3. Configure EAS in the project (creates `eas.json`):
-
-```bash
-eas build:configure
-```
-
-4. Build APK (not AAB):
-
-```bash
-eas build -p android --profile preview
-```
-
-5. Download APK from the build URL returned by EAS and share it.
-
-Notes:
-
-- Keep Expo start instructions as the primary path.
-- APK is an additional reviewer-friendly option only.
 
 ## Quick Reviewer Run Path
 
