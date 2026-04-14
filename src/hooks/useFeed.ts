@@ -11,18 +11,32 @@ export function useFeed() {
   const [page, setPage] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  const replaceArticles = async (nextArticles: HackerNewsItem[]) => {
+    setArticles(nextArticles);
+    setPage(0);
+    await saveCachedFeed(nextArticles);
+  };
+
+  const appendUniqueArticles = (nextArticles: HackerNewsItem[]) => {
+    setArticles((currentArticles) => {
+      const existingIds = new Set(currentArticles.map((article) => article.id));
+
+      const uniqueNewArticles = nextArticles.filter(
+        (article) => !existingIds.has(article.id),
+      );
+
+      return [...currentArticles, ...uniqueNewArticles];
+    });
+  };
+
   useEffect(() => {
     const loadInitial = async () => {
       try {
         setIsLoading(true);
         setErrorMessage(null);
 
-        //throw new Error("Simulated network error"); // Simulate a network error for testing
-
         const data = await fetchTopStoriesPage(0);
-        setArticles(data);
-        setPage(0);
-        await saveCachedFeed(data);
+        await replaceArticles(data);
       } catch {
         const cachedData = await getCachedFeed();
 
@@ -43,11 +57,10 @@ export function useFeed() {
   const refresh = async () => {
     try {
       setIsRefreshing(true);
+      setErrorMessage(null);
 
       const data = await fetchTopStoriesPage(0);
-      setArticles(data);
-      setPage(0);
-      await saveCachedFeed(data);
+      await replaceArticles(data);
     } catch {
       setErrorMessage("Failed to refresh articles");
     } finally {
@@ -60,18 +73,12 @@ export function useFeed() {
 
     try {
       setIsLoadingMore(true);
+      setErrorMessage(null);
 
       const nextPage = page + 1;
       const data = await fetchTopStoriesPage(nextPage);
 
-      setArticles((prev) => {
-        const existingIds = new Set(prev.map((article) => article.id));
-        const uniqueNewArticles = data.filter(
-          (article) => !existingIds.has(article.id),
-        );
-
-        return [...prev, ...uniqueNewArticles];
-      });
+      appendUniqueArticles(data);
       setPage(nextPage);
     } catch {
       setErrorMessage("Failed to load more articles");

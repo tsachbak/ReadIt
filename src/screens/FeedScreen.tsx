@@ -8,7 +8,6 @@ import {
   View,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { logout } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 import { useFeed } from "../hooks/useFeed";
 import { RootStackParamList } from "../navigation/types";
@@ -33,8 +32,7 @@ export default function FeedScreen({ navigation }: Props) {
   const isConnected = useNetworkStatus();
 
   const handleLogout = async () => {
-    await logout();
-    signOut();
+    await signOut();
   };
 
   const showRefreshSkeleton = isRefreshing && articles.length > 0;

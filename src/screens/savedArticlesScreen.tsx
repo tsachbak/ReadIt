@@ -11,7 +11,6 @@ import { useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/types";
 import { useNetworkStatus } from "../hooks/useNetworkStatus";
 import { useAuth } from "../hooks/useAuth";
-import { logout } from "../services/authService";
 import ArticleCard from "../components/ArticleCard";
 import ArticleCardSkeleton from "../components/ArticleCardSkeleton";
 import TopBar from "../components/TopBar";
@@ -31,8 +30,7 @@ export default function SavedArticlesScreen({ navigation }: Props) {
   const { signOut } = useAuth();
 
   const handleLogout = async () => {
-    await logout();
-    signOut();
+    await signOut();
   };
 
   useFocusEffect(

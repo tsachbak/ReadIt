@@ -10,6 +10,11 @@ export default function AuthProvider({ children }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const signOut = async () => {
+    await logout();
+    setIsAuthenticated(false);
+  };
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -18,8 +23,7 @@ export default function AuthProvider({ children }: Props) {
         if (token && !isTokenExpired(token)) {
           setIsAuthenticated(true);
         } else if (token && isTokenExpired(token)) {
-          await logout();
-          setIsAuthenticated(false);
+          await signOut();
         }
       } finally {
         setIsLoading(false);
@@ -34,7 +38,7 @@ export default function AuthProvider({ children }: Props) {
       isAuthenticated,
       isLoading,
       signIn: () => setIsAuthenticated(true),
-      signOut: () => setIsAuthenticated(false),
+      signOut,
     }),
     [isAuthenticated, isLoading],
   );

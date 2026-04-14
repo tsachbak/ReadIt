@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "../screens/LoginScreen";
 import FeedScreen from "../screens/FeedScreen";
 import ArticleDetailScreen from "../screens/ArticleDetailScreen";
-import SavedArticlesScreen from "../screens/savedArticlesScreen";
+import SavedArticlesScreen from "../screens/SavedArticlesScreen";
 import { RootStackParamList } from "./types";
 import { useAuth } from "../hooks/useAuth";
 
