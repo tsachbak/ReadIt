@@ -1,14 +1,12 @@
-import {
-  Button,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useBookmarksStore } from "../store/bookmarksStore";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
+import { useNetworkStatus } from "../hooks/useNetworkStatus";
+import { useAuth } from "../hooks/useAuth";
+import { logout } from "../services/authService";
+import ArticleCard from "../components/ArticleCard";
+import TopBar from "../components/TopBar";
 
 type Props = NativeStackScreenProps<RootStackParamList, "SavedArticles">;
 
@@ -17,58 +15,57 @@ export default function SavedArticlesScreen({ navigation }: Props) {
     (state) => state.bookmarkedArticles,
   );
 
-  const removeBookmark = useBookmarksStore((state) => state.removeBookmark);
+  const isConnected = useNetworkStatus();
+  const { signOut } = useAuth();
 
-  if (bookmarkedArticles.length === 0) {
-    return (
-      <View style={styles.centered}>
-        <Text>No saved articles yet.</Text>
-      </View>
-    );
-  }
+  const handleLogout = async () => {
+    await logout();
+    signOut();
+  };
 
   return (
-    <FlatList
-      data={bookmarkedArticles}
-      keyExtractor={(item) => item.id.toString()}
-      contentContainerStyle={styles.listContent}
-      renderItem={({ item }) => (
-        <Pressable
-          onPress={() => navigation.navigate("Detail", { article: item })}
-          style={styles.articleRow}
-        >
-          <Text style={styles.title}>{item.title}</Text>
-          <View style={styles.actionsRow}>
-            <Button title="Remove" onPress={() => removeBookmark(item.id)} />
-          </View>
-        </Pressable>
+    <View style={styles.container}>
+      <TopBar
+        title="Saved Articles"
+        isConnected={isConnected}
+        onFeedPress={() => navigation.navigate("Feed")}
+        onSavedPress={() => navigation.navigate("SavedArticles")}
+        onLogout={handleLogout}
+      />
+
+      {bookmarkedArticles.length === 0 ? (
+        <View style={styles.centered}>
+          <Text>No saved articles yet.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={bookmarkedArticles}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <ArticleCard
+              article={item}
+              onPress={() => navigation.navigate("Detail", { article: item })}
+              actionMode="remove"
+            />
+          )}
+        />
       )}
-    />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   centered: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 24,
   },
   listContent: {
     padding: 16,
     gap: 12,
-  },
-  articleRow: {
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 8,
-    gap: 12,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  actionsRow: {
-    alignItems: "flex-start",
   },
 });

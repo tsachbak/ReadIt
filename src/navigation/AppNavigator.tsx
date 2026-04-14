@@ -27,7 +27,11 @@ export default function AppNavigator() {
       <Stack.Navigator>
         {isAuthenticated ? (
           <>
-            <Stack.Screen name="Feed" component={FeedScreen} />
+            <Stack.Screen
+              name="Feed"
+              component={FeedScreen}
+              options={{ headerBackVisible: false }}
+            />
             <Stack.Screen
               name="Detail"
               component={ArticleDetailScreen}
@@ -36,11 +40,18 @@ export default function AppNavigator() {
             <Stack.Screen
               name="SavedArticles"
               component={SavedArticlesScreen}
-              options={{ title: "Saved Articles" }}
+              options={{
+                title: "Favourite Articles",
+                headerBackVisible: false,
+              }}
             />
           </>
         ) : (
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{ headerBackVisible: false }}
+          />
         )}
       </Stack.Navigator>
     </NavigationContainer>

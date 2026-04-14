@@ -12,6 +12,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useFeed } from "../hooks/useFeed";
 import { RootStackParamList } from "../navigation/types";
 import { useNetworkStatus } from "../hooks/useNetworkStatus";
+import TopBar from "../components/TopBar";
 import ArticleCard from "../components/ArticleCard";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Feed">;
@@ -54,19 +55,13 @@ export default function FeedScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.networkIndicator,
-          { backgroundColor: isConnected ? "#34D399" : "#EF4444" },
-        ]}
+      <TopBar
+        title="Top Stories"
+        isConnected={isConnected}
+        onFeedPress={() => navigation.navigate("Feed")}
+        onSavedPress={() => navigation.navigate("SavedArticles")}
+        onLogout={handleLogout}
       />
-      <View style={styles.topActions}>
-        <Button
-          title="Saved Articles"
-          onPress={() => navigation.navigate("SavedArticles")}
-        />
-        <Button title="Logout" onPress={handleLogout} />
-      </View>
 
       <FlatList
         data={articles}
@@ -99,22 +94,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 16,
-  },
-  topActions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    gap: 12,
-  },
-  networkIndicator: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    zIndex: 10,
   },
   centeredContainer: {
     flex: 1,
