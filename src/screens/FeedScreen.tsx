@@ -2,6 +2,7 @@ import {
   ActivityIndicator,
   Button,
   FlatList,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -14,6 +15,7 @@ import { RootStackParamList } from "../navigation/types";
 import { useNetworkStatus } from "../hooks/useNetworkStatus";
 import TopBar from "../components/TopBar";
 import ArticleCard from "../components/ArticleCard";
+import ArticleCardSkeleton from "../components/ArticleCardSkeleton";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Feed">;
 
@@ -35,11 +37,29 @@ export default function FeedScreen({ navigation }: Props) {
     signOut();
   };
 
+  const showRefreshSkeleton = isRefreshing && articles.length > 0;
+
   if (isLoading) {
     return (
-      <View style={styles.centeredContainer}>
-        <ActivityIndicator />
-        <Text>Loading feed...</Text>
+      <View style={styles.container}>
+        <TopBar
+          title="Top Stories"
+          activeTab="feed"
+          isConnected={isConnected}
+          onFeedPress={() => navigation.navigate("Feed")}
+          onSavedPress={() => navigation.navigate("SavedArticles")}
+          onLogout={handleLogout}
+        />
+
+        <ScrollView
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.loadingLabel}>Fetching top stories...</Text>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <ArticleCardSkeleton key={`skeleton-${index}`} />
+          ))}
+        </ScrollView>
       </View>
     );
   }
@@ -67,11 +87,13 @@ export default function FeedScreen({ navigation }: Props) {
       <FlatList
         data={articles}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <ArticleCard
             article={item}
             onPress={() => navigation.navigate("Detail", { article: item })}
             actionMode="toggle"
+            enableEntryAnimation
+            animationDelayMs={Math.min(index * 35, 210)}
           />
         )}
         contentContainerStyle={styles.listContent}
@@ -79,6 +101,14 @@ export default function FeedScreen({ navigation }: Props) {
         onEndReachedThreshold={0.5}
         refreshing={isRefreshing}
         onRefresh={refresh}
+        ListHeaderComponent={
+          showRefreshSkeleton ? (
+            <View style={styles.refreshSkeletonContainer}>
+              <ArticleCardSkeleton />
+              <ArticleCardSkeleton />
+            </View>
+          ) : null
+        }
         ListFooterComponent={
           isLoadingMore ? (
             <View style={styles.footerLoader}>
@@ -106,6 +136,16 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 16,
     gap: 12,
+  },
+  loadingLabel: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#64748B",
+    paddingBottom: 4,
+  },
+  refreshSkeletonContainer: {
+    gap: 12,
+    paddingBottom: 12,
   },
   footerLoader: {
     paddingVertical: 16,

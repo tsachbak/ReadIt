@@ -1,4 +1,12 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useEffect, useRef } from "react";
+import {
+  Animated,
+  Easing,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { HackerNewsItem } from "../api/hackerNews/hackerNews.types";
 import { getDomainFromUrl } from "../utils/getDomainFromUrl";
 import { getRelativeTime } from "../utils/getRelativeTime";
@@ -8,12 +16,18 @@ type Props = {
   article: HackerNewsItem;
   onPress: () => void;
   actionMode: "toggle" | "remove";
+  enableEntryAnimation?: boolean;
+  animationDelayMs?: number;
+  animationTrigger?: number;
 };
 
 export default function ArticleCard({
   article,
   onPress,
   actionMode = "toggle",
+  enableEntryAnimation = false,
+  animationDelayMs = 0,
+  animationTrigger = 0,
 }: Props) {
   const toggleBookmark = useBookmarksStore((state) => state.toggleBookmark);
   const removeBookmark = useBookmarksStore((state) => state.removeBookmark);
@@ -53,50 +67,120 @@ export default function ArticleCard({
         ? styles.savedButtonText
         : styles.saveButtonText;
 
+  const animatedOpacity = useRef(
+    new Animated.Value(enableEntryAnimation ? 0 : 1),
+  ).current;
+  const animatedTranslateY = useRef(
+    new Animated.Value(enableEntryAnimation ? 24 : 0),
+  ).current;
+  const animatedScale = useRef(
+    new Animated.Value(enableEntryAnimation ? 0.97 : 1),
+  ).current;
+
+  useEffect(() => {
+    if (!enableEntryAnimation) {
+      animatedOpacity.setValue(1);
+      animatedTranslateY.setValue(0);
+      animatedScale.setValue(1);
+      return;
+    }
+
+    animatedOpacity.setValue(0);
+    animatedTranslateY.setValue(24);
+    animatedScale.setValue(0.97);
+
+    const animation = Animated.parallel([
+      Animated.timing(animatedOpacity, {
+        toValue: 1,
+        duration: 420,
+        delay: animationDelayMs,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(animatedTranslateY, {
+        toValue: 0,
+        duration: 420,
+        delay: animationDelayMs,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(animatedScale, {
+        toValue: 1,
+        duration: 420,
+        delay: animationDelayMs,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]);
+
+    animation.start();
+
+    return () => {
+      animation.stop();
+    };
+  }, [
+    animatedOpacity,
+    animatedScale,
+    animatedTranslateY,
+    animationDelayMs,
+    animationTrigger,
+    enableEntryAnimation,
+  ]);
+
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.container,
-        pressed && styles.containerPressed,
-      ]}
+    <Animated.View
+      style={{
+        opacity: animatedOpacity,
+        transform: [
+          { translateY: animatedTranslateY },
+          { scale: animatedScale },
+        ],
+      }}
     >
-      <View style={styles.headerRow}>
-        <View style={styles.sourcePill}>
-          <Text style={styles.sourcePillText}>{sourceLabel}</Text>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.container,
+          pressed && styles.containerPressed,
+        ]}
+      >
+        <View style={styles.headerRow}>
+          <View style={styles.sourcePill}>
+            <Text style={styles.sourcePillText}>{sourceLabel}</Text>
+          </View>
+
+          <Pressable
+            onPress={handleActionPress}
+            style={[styles.actionButton, actionButtonStyle]}
+          >
+            <Text style={[styles.actionText, actionTextStyle]}>
+              {actionLabel}
+            </Text>
+          </Pressable>
         </View>
 
-        <Pressable
-          onPress={handleActionPress}
-          style={[styles.actionButton, actionButtonStyle]}
-        >
-          <Text style={[styles.actionText, actionTextStyle]}>
-            {actionLabel}
-          </Text>
-        </Pressable>
-      </View>
+        <Text style={styles.title}>{article.title}</Text>
 
-      <Text style={styles.title}>{article.title}</Text>
+        <Text style={styles.authorText}>by {article.by}</Text>
 
-      <Text style={styles.authorText}>by {article.by}</Text>
+        <View style={styles.statsRow}>
+          <View style={styles.statChip}>
+            <Text style={styles.statLabel}>Score</Text>
+            <Text style={styles.statValue}>{article.score}</Text>
+          </View>
 
-      <View style={styles.statsRow}>
-        <View style={styles.statChip}>
-          <Text style={styles.statLabel}>Score</Text>
-          <Text style={styles.statValue}>{article.score}</Text>
+          <View style={styles.statChip}>
+            <Text style={styles.statLabel}>Comments</Text>
+            <Text style={styles.statValue}>{article.descendants ?? 0}</Text>
+          </View>
         </View>
 
-        <View style={styles.statChip}>
-          <Text style={styles.statLabel}>Comments</Text>
-          <Text style={styles.statValue}>{article.descendants ?? 0}</Text>
+        <View style={styles.footerRow}>
+          <Text style={styles.footerText}>{timeLabel}</Text>
+          <Text style={styles.footerText}>HN Story</Text>
         </View>
-      </View>
-
-      <View style={styles.footerRow}>
-        <Text style={styles.footerText}>{timeLabel}</Text>
-        <Text style={styles.footerText}>HN Story</Text>
-      </View>
-    </Pressable>
+      </Pressable>
+    </Animated.View>
   );
 }
 
