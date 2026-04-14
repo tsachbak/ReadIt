@@ -27,6 +27,7 @@ export default function SavedArticlesScreen({ navigation }: Props) {
     <View style={styles.container}>
       <TopBar
         title="Saved Articles"
+        activeTab="saved"
         isConnected={isConnected}
         onFeedPress={() => navigation.navigate("Feed")}
         onSavedPress={() => navigation.navigate("SavedArticles")}

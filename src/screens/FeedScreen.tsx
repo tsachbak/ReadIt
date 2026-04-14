@@ -57,6 +57,7 @@ export default function FeedScreen({ navigation }: Props) {
     <View style={styles.container}>
       <TopBar
         title="Top Stories"
+        activeTab="feed"
         isConnected={isConnected}
         onFeedPress={() => navigation.navigate("Feed")}
         onSavedPress={() => navigation.navigate("SavedArticles")}
